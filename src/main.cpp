@@ -183,6 +183,9 @@ int main() {
     Model floatingIslandModel("resources/objects/hot_air_balloon/scene.gltf");
     floatingIslandModel.SetShaderTextureNamePrefix("material.");
 
+    Model airBoyModel("resources/objects/airman/scene.gltf");
+    airBoyModel.SetShaderTextureNamePrefix(("material."));
+
 
     //skyBox
 
@@ -290,7 +293,7 @@ int main() {
 
         // don't forget to enable shader before setting uniforms
         ourShader.use();
-        pointLight.position = glm::vec3(4.0 * cos(currentFrame), 4.0f, 4.0 * sin(currentFrame));
+        pointLight.position = glm::vec3(4.0 , 4.0f, 4.0 );
         ourShader.setVec3("pointLight.position", pointLight.position);
         ourShader.setVec3("pointLight.ambient", pointLight.ambient);
         ourShader.setVec3("pointLight.diffuse", pointLight.diffuse);
@@ -313,7 +316,7 @@ int main() {
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model,
-                               glm::vec3 (60,-11+cos(currentFrame)*0.4f,10)); // translate it down so it's at the center of the scene
+                               glm::vec3 (60,-11+cos(currentFrame)*0.4f,20)); // translate it down so it's at the center of the scene
         model = glm::scale(model, glm::vec3(0.03,0.03,0.03));    // it's a bit too big for our scene, so scale it down
         model = glm::rotate(model, glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         ourShader.setMat4("model", model);
@@ -324,21 +327,31 @@ int main() {
         model0 = glm::translate(model0,
                                 glm::vec3 (80,-15+cos(currentFrame)*0.2f,32)); // translate it down so it's at the center of the scene
         model0 = glm::scale(model0, glm::vec3(0.01,0.01,0.01));
-        model0 = glm::rotate(model0, glm::radians(-40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        //model0 = glm::rotate(model0, glm::radians(-40.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model0);
         ourModel.Draw(ourShader);
 
 
-    //hot air ballon
+    //hot air ballon render
         glm::mat4 model1 = glm::mat4(1.0f);
         model1 = glm::translate(model1,
-                                glm::vec3 (80+sin(currentFrame)*15.0f,-15+cos(currentFrame)*5.0f,17)); // translate it down so it's at the center of the scene
-        model1 = glm::rotate(model1, glm::radians(-60.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+                                glm::vec3 (78,-12+cos(currentFrame)*2.0f,32)); // translate it down so it's at the center of the scene
+        model1 = glm::rotate(model1, glm::radians(-80.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         model1 = glm::scale(model1, glm::vec3(0.3,0.3,0.3));
         // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model1);
         floatingIslandModel.Draw(ourShader);
+
+        //air boy render
+        glm::mat4 model2 = glm::mat4(1.0f);
+        model2 = glm::translate(model2,
+                                glm::vec3 (55,-10+cos(currentFrame)*0.4f,20));
+        //model2 = glm::rotate(model2, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model2 = glm::scale(model2, glm::vec3(0.2,0.2,0.2));
+        // it's a bit too big for our scene, so scale it down
+        ourShader.setMat4("model", model2);
+        airBoyModel.Draw(ourShader);
 
         //glm::vec3 (63,-10,17) - ako hocu da je nesto na ostvru
 
