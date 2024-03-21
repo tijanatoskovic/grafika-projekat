@@ -26,6 +26,8 @@ void processInput(GLFWwindow *window);
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
+unsigned int loadCubemap(vector<std::string> faces);
+
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -159,27 +161,111 @@ int main() {
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
+    //blending
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    //face
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+    glFrontFace(GL_CW);
+
     // build and compile shaders
     // -------------------------
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
-
+    Shader skyboxShader("resources/shaders/skybox.vs", "resources/shaders/skybox.fs");
+    Shader blendingShader("resources/shaders/2.model_lighting.vs", "resources/shaders/blending.fs" );
     // load models
     // -----------
-    Model ourModel("resources/objects/backpack/backpack.obj");
+    Model ourModel("resources/objects/stylized_mini_floating_island/scene.gltf");
     ourModel.SetShaderTextureNamePrefix("material.");
+
+    Model floatingIslandModel("resources/objects/hot_air_balloon/scene.gltf");
+    floatingIslandModel.SetShaderTextureNamePrefix("material.");
+
+
+    //skyBox
+
+    float skyboxVertices[] = {
+            // positions
+            -1.0f,  1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+
+            -1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f,  1.0f,
+            -1.0f, -1.0f,  1.0f,
+
+            1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+
+            -1.0f, -1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f,  1.0f,
+
+            -1.0f,  1.0f, -1.0f,
+            1.0f,  1.0f, -1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f, -1.0f,
+
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f,  1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f,  1.0f,
+            1.0f, -1.0f,  1.0f
+    };
+
 
     PointLight& pointLight = programState->pointLight;
     pointLight.position = glm::vec3(4.0f, 4.0, 0.0);
     pointLight.ambient = glm::vec3(0.1, 0.1, 0.1);
-    pointLight.diffuse = glm::vec3(0.6, 0.6, 0.6);
+    pointLight.diffuse = glm::vec3(1, 1, 1);
     pointLight.specular = glm::vec3(1.0, 1.0, 1.0);
 
     pointLight.constant = 1.0f;
-    pointLight.linear = 0.09f;
-    pointLight.quadratic = 0.032f;
+    pointLight.linear = 0.0f;
+    pointLight.quadratic = 0.0f;
 
 
+    // skybox vao
+    unsigned int skyBoxVAO, skyBoxVBO;
+    glGenVertexArrays(1, &skyBoxVAO);
+    glGenBuffers(1, &skyBoxVBO);
+    glBindVertexArray(skyBoxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyBoxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
+    vector<std::string> faces
+            {
+                    FileSystem::getPath("resources/textures/dust_lf.jpg"),
+                    FileSystem::getPath("resources/textures/dust_rt.jpg"),
+                    FileSystem::getPath("resources/textures/dust_dn.jpg"),
+                    FileSystem::getPath("resources/textures/dust_up.jpg"),
+                    FileSystem::getPath("resources/textures/dust_ft.jpg"),
+                    FileSystem::getPath("resources/textures/dust_bk.jpg")
+            };
+    unsigned int cubemapTexture = loadCubemap(faces);
+
+    skyboxShader.use();
+    skyboxShader.setInt("skybox", 0);
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -221,13 +307,69 @@ int main() {
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
 
+        //????
+        glDepthFunc(GL_LEQUAL);
+
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model,
-                               programState->backpackPosition); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(programState->backpackScale));    // it's a bit too big for our scene, so scale it down
+                               glm::vec3 (60,-11+cos(currentFrame)*0.4f,10)); // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(0.03,0.03,0.03));    // it's a bit too big for our scene, so scale it down
+        model = glm::rotate(model, glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
+
+        //renderovanje drugog mini-floatin-island
+        glm::mat4 model0 = glm::mat4(1.0f);
+        model0 = glm::translate(model0,
+                                glm::vec3 (80,-15+cos(currentFrame)*0.2f,32)); // translate it down so it's at the center of the scene
+        model0 = glm::scale(model0, glm::vec3(0.01,0.01,0.01));
+        model0 = glm::rotate(model0, glm::radians(-40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        // it's a bit too big for our scene, so scale it down
+        ourShader.setMat4("model", model0);
+        ourModel.Draw(ourShader);
+
+
+    //hot air ballon
+        glm::mat4 model1 = glm::mat4(1.0f);
+        model1 = glm::translate(model1,
+                                glm::vec3 (80+sin(currentFrame)*15.0f,-15+cos(currentFrame)*5.0f,17)); // translate it down so it's at the center of the scene
+        model1 = glm::rotate(model1, glm::radians(-60.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model1 = glm::scale(model1, glm::vec3(0.3,0.3,0.3));
+        // it's a bit too big for our scene, so scale it down
+        ourShader.setMat4("model", model1);
+        floatingIslandModel.Draw(ourShader);
+
+        //glm::vec3 (63,-10,17) - ako hocu da je nesto na ostvru
+
+        //blendovanje
+//        blendingShader.use();
+//        blendingShader.setVec3("viewPosition", programState->camera.Position);
+//        blendingShader.setFloat("material.shininess", 32.0f);
+//        blendingShader.setMat4("projection", projection);
+//        blendingShader.setMat4("view", view);
+//        blendingShader.setVec3("dirLight.direction", glm::vec3(-0.547f, -0.727f, 0.415f));
+//        blendingShader.setVec3("dirLight.ambient", glm::vec3(0.35f));
+//        blendingShader.setVec3("dirLight.diffuse", glm::vec3(0.4f));
+//        blendingShader.setVec3("dirLight.specular", glm::vec3(0.2f));
+
+        // skybox cube
+
+        skyboxShader.use();
+        view[3][0] = 0; // Postavljam x translaciju na nulu
+        view[3][1] = 0; // Postavljam y translaciju na nulu
+        view[3][2] = 0; // postavljam z translaciju na nulu
+        view[3][3] = 0;
+        skyboxShader.setMat4("view", view);
+        skyboxShader.setMat4("projection", projection);
+
+        glBindVertexArray(skyBoxVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthFunc(GL_LESS); // set depth function back to default
+
 
         if (programState->ImGuiEnabled)
             DrawImGui(programState);
@@ -298,6 +440,36 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     programState->camera.ProcessMouseScroll(yoffset);
+}
+
+unsigned int loadCubemap(vector<std::string> faces)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    int width, height, nrChannels;
+    for (unsigned int i = 0; i < faces.size(); i++)
+    {
+        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            stbi_image_free(data);
+        }
+        else
+        {
+            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
 }
 
 void DrawImGui(ProgramState *programState) {
