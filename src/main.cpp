@@ -173,11 +173,12 @@ int main() {
     // build and compile shaders
     // -------------------------
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
+    Shader myShader("resources/shaders/6.multiple_lights.vs", "resources/shaders/6.multiple_lights.fs");
     Shader skyboxShader("resources/shaders/skybox.vs", "resources/shaders/skybox.fs");
     Shader blendingShader("resources/shaders/2.model_lighting.vs", "resources/shaders/blending.fs" );
     // load models
     // -----------
-    Model ourModel("resources/objects/stylized_mini_floating_island/scene.gltf");
+    Model ourModel("resources/objects/floating_island(1)/scene.gltf");
     ourModel.SetShaderTextureNamePrefix("material.");
 
     Model floatingIslandModel("resources/objects/hot_air_balloon/scene.gltf");
@@ -186,6 +187,26 @@ int main() {
     Model airBoyModel("resources/objects/airman/scene.gltf");
     airBoyModel.SetShaderTextureNamePrefix(("material."));
 
+    Model flyingLightHouse("resources/objects/flying_lighthouse/scene.gltf");
+    flyingLightHouse.SetShaderTextureNamePrefix("material.");
+
+    Model baseIsland("resources/objects/base_island/scene.gltf");
+    baseIsland.SetShaderTextureNamePrefix("material.");
+
+    Model model1OnBaseIsland("resources/objects/steampunk_lighthouse/scene.gltf");
+    model1OnBaseIsland.SetShaderTextureNamePrefix("material.");
+
+    Model model2OnBaseIsland("resources/objects/da_vincis_-_flying_machine/scene.gltf");
+    model2OnBaseIsland.SetShaderTextureNamePrefix("material.");
+
+    Model treeModel("resources/objects/platano_tree/scene.gltf");
+    treeModel.SetShaderTextureNamePrefix("material.");
+
+    Model tree2Model("resources/objects/trees_low_poly/scene.gltf");
+    tree2Model.SetShaderTextureNamePrefix("material.");
+
+    Model windmillModel("resources/objects/mill-wind/scene.gltf");
+    windmillModel.SetShaderTextureNamePrefix("material.");
 
     //skyBox
 
@@ -316,17 +337,17 @@ int main() {
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model,
-                               glm::vec3 (60,-11+cos(currentFrame)*0.4f,20)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(0.03,0.03,0.03));    // it's a bit too big for our scene, so scale it down
-        model = glm::rotate(model, glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                               glm::vec3 (68,-11+cos(currentFrame)*0.4f,20)); // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(0.1,0.1,0.1));    // it's a bit too big for our scene, so scale it down
+        model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
 
         //renderovanje drugog mini-floatin-island
         glm::mat4 model0 = glm::mat4(1.0f);
         model0 = glm::translate(model0,
-                                glm::vec3 (80,-15+cos(currentFrame)*0.2f,32)); // translate it down so it's at the center of the scene
-        model0 = glm::scale(model0, glm::vec3(0.01,0.01,0.01));
+                                glm::vec3 (86,-15+cos(currentFrame)*0.2f,32)); // translate it down so it's at the center of the scene
+        model0 = glm::scale(model0, glm::vec3(0.08,0.08,0.08));
         //model0 = glm::rotate(model0, glm::radians(-40.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model0);
@@ -336,24 +357,122 @@ int main() {
     //hot air ballon render
         glm::mat4 model1 = glm::mat4(1.0f);
         model1 = glm::translate(model1,
-                                glm::vec3 (78,-12+cos(currentFrame)*2.0f,32)); // translate it down so it's at the center of the scene
+                                glm::vec3 (80,-11.4+cos(currentFrame)*2.0f,34)); // translate it down so it's at the center of the scene
         model1 = glm::rotate(model1, glm::radians(-80.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         model1 = glm::scale(model1, glm::vec3(0.3,0.3,0.3));
         // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model1);
         floatingIslandModel.Draw(ourShader);
 
+
         //air boy render
         glm::mat4 model2 = glm::mat4(1.0f);
         model2 = glm::translate(model2,
-                                glm::vec3 (55,-10+cos(currentFrame)*0.4f,20));
+                                glm::vec3 (73,-8.6+cos(currentFrame)*0.4f,24));
         //model2 = glm::rotate(model2, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model2 = glm::scale(model2, glm::vec3(0.2,0.2,0.2));
+        model2 = glm::scale(model2, glm::vec3(0.1,0.1,0.1));
         // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model2);
         airBoyModel.Draw(ourShader);
 
-        //glm::vec3 (63,-10,17) - ako hocu da je nesto na ostvru
+        //base island
+        glm::mat4 model3 = glm::mat4(1.0f);
+        model3 = glm::translate(model3,
+                                glm::vec3 (70,-15+cos(currentFrame)*0.1f,40));
+        //model3 = glm::rotate(model2, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model3 = glm::scale(model3, glm::vec3(0.9,0.9,0.9));
+        // it's a bit too big for our scene, so scale it down
+        ourShader.setMat4("model", model3);
+        baseIsland.Draw(ourShader);
+
+        //model1 on base island
+        glm::mat4 model4 = glm::mat4(1.0f);
+        model4 = glm::translate(model4,
+                                glm::vec3 (67.3,-14+cos(currentFrame)*0.1f,40));
+        model4 = glm::rotate(model4, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model4 = glm::scale(model4, glm::vec3(0.01,0.01,0.01));
+        // it's a bit too big for our scene, so scale it down
+        ourShader.setMat4("model", model4);
+        model1OnBaseIsland.Draw(ourShader);
+
+        //model2 on base island
+        glm::mat4 model5 = glm::mat4(1.0f);
+        model5 = glm::translate(model5,
+                                glm::vec3 (61.9,-9+cos(currentFrame)*0.1f,34.3));
+        model5 = glm::rotate(model5, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model5 = glm::scale(model5, glm::vec3(0.3,0.3,0.3));
+        ourShader.setMat4("model", model5);
+        model2OnBaseIsland.Draw(ourShader);
+
+        //flying lighthouse render
+        glm::mat4 model6 = glm::mat4(1.0f);
+        model6 = glm::translate(model6,
+                                glm::vec3 (86.2,-13.8+cos(currentFrame)*0.2f,40)); // translate it down so it's at the center of the scene
+        model6 = glm::rotate(model6, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model6 = glm::scale(model6, glm::vec3(0.03,0.03,0.03));
+        // it's a bit too big for our scene, so scale it down
+        ourShader.setMat4("model", model6);
+        flyingLightHouse.Draw(ourShader);
+
+        //tree render
+        glm::mat4 tree1 = glm::mat4(1.0f);
+        tree1 = glm::translate(tree1,
+                                glm::vec3 (89,-13.5+cos(currentFrame)*0.2f,32));
+        tree1 = glm::scale(tree1, glm::vec3(0.008,0.008,0.008));
+        tree1 = glm::rotate(tree1, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        ourShader.setMat4("model", tree1);
+        treeModel.Draw(ourShader);
+
+        //windmill render
+        glm::mat4 windmill = glm::mat4(1.0f);
+        windmill = glm::translate(windmill,
+                               glm::vec3 (73,-10.5+cos(currentFrame)*0.1f,45));
+        windmill = glm::scale(windmill, glm::vec3(0.4,0.4,0.4));
+        windmill = glm::rotate(windmill, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        windmill = glm::rotate(windmill, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        ourShader.setMat4("model", windmill);
+        windmillModel.Draw(ourShader);
+
+        //tree2 render
+        glm::mat4 tree2 = glm::mat4(1.0f);
+        tree2 = glm::translate(tree2,
+                                  glm::vec3 (75.5,-13.2+cos(currentFrame)*0.1f,46));
+        tree2 = glm::rotate(tree2, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        tree2 = glm::scale(tree2, glm::vec3(0.03,0.03,0.03));
+        ourShader.setMat4("model", tree2);
+        tree2Model.Draw(ourShader);
+
+        glm::mat4 tree21 = glm::mat4(1.0f);
+        tree21 = glm::translate(tree21,
+                               glm::vec3 (72.2,-13.5+cos(currentFrame)*0.1f,48.5));
+        tree21 = glm::rotate(tree21, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        tree21 = glm::scale(tree21, glm::vec3(0.025,0.025,0.025));
+        ourShader.setMat4("model", tree21);
+        tree2Model.Draw(ourShader);
+
+        glm::mat4 tree22 = glm::mat4(1.0f);
+        tree22 = glm::translate(tree22,
+                                glm::vec3 (69.4,-13.2+cos(currentFrame)*0.1f,45.2));
+        tree22 = glm::rotate(tree22, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        tree22 = glm::scale(tree22, glm::vec3(0.03,0.03,0.03));
+        ourShader.setMat4("model", tree22);
+        tree2Model.Draw(ourShader);
+
+        glm::mat4 tree23 = glm::mat4(1.0f);
+        tree23 = glm::translate(tree23,
+                                glm::vec3 (74,-13.2+cos(currentFrame)*0.1f,47.4));
+        tree23 = glm::rotate(tree23, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        tree23 = glm::scale(tree23, glm::vec3(0.008,0.008,0.008));
+        ourShader.setMat4("model", tree23);
+        treeModel.Draw(ourShader);
+
+        glm::mat4 tree24 = glm::mat4(1.0f);
+        tree24 = glm::translate(tree24,
+                                glm::vec3 (69,-9.8+cos(currentFrame)*0.4f,14.2));
+        tree24 = glm::rotate(tree24, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        tree24 = glm::scale(tree24, glm::vec3(0.04,0.04,0.04));
+        ourShader.setMat4("model", tree24);
+        tree2Model.Draw(ourShader);
 
         //blendovanje
 //        blendingShader.use();

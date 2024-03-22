@@ -1,0 +1,11 @@
+Model Information:
+* title:	Da Vinci's - Flying Machine
+* source:	https://sketchfab.com/3d-models/da-vincis-flying-machine-ac60c0bc847e4929bf8aa9772ac49b1a
+* author:	vanessalani (https://sketchfab.com/vanessalani)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Da Vinci's - Flying Machine" (https://sketchfab.com/3d-models/da-vincis-flying-machine-ac60c0bc847e4929bf8aa9772ac49b1a) by vanessalani (https://sketchfab.com/vanessalani) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
