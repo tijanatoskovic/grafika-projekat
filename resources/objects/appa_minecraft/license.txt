@@ -1,0 +1,11 @@
+Model Information:
+* title:	Appa (Minecraft)
+* source:	https://sketchfab.com/3d-models/appa-minecraft-55f92e46ba964667bba5dba8793a3b53
+* author:	Sprint (https://sketchfab.com/Sprintpt)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Appa (Minecraft)" (https://sketchfab.com/3d-models/appa-minecraft-55f92e46ba964667bba5dba8793a3b53) by Sprint (https://sketchfab.com/Sprintpt) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
