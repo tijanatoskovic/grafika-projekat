@@ -75,7 +75,7 @@ private:
 
             if (mesh->mTextureCoords[0]) {
                 vertex.TexCoords.x = mesh->mTextureCoords[0][i].x;
-                vertex.TexCoords.y = mesh->mTextureCoords[0][i].y;
+                vertex.TexCoords.y = 1 - mesh->mTextureCoords[0][i].y;
 
                 vertex.Tangent.x = mesh->mTangents[i].x;
                 vertex.Tangent.y = mesh->mTangents[i].y;

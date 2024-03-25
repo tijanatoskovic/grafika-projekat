@@ -173,7 +173,6 @@ int main() {
     // build and compile shaders
     // -------------------------
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
-    Shader myShader("resources/shaders/6.multiple_lights.vs", "resources/shaders/6.multiple_lights.fs");
     Shader skyboxShader("resources/shaders/skybox.vs", "resources/shaders/skybox.fs");
     Shader blendingShader("resources/shaders/2.model_lighting.vs", "resources/shaders/blending.fs" );
     // load models
@@ -211,8 +210,14 @@ int main() {
     Model appaModel("resources/objects/appa_bison_4/scene.gltf");
     appaModel.SetShaderTextureNamePrefix("material.");
 
-    Model houseModel("resources/objects/medieval_house/scene.gltf");
-    houseModel.SetShaderTextureNamePrefix("material.");
+    Model bigTreeModel("resources/objects/low_poly_tree_scene_free/scene.gltf");
+    bigTreeModel.SetShaderTextureNamePrefix("material.");
+
+    Model backgroundFloatingIsland1("resources/objects/background_floating_islands/diorama_floating_islands__shrine/scene.gltf");
+    backgroundFloatingIsland1.SetShaderTextureNamePrefix("material.");
+
+    Model backgroundFloatingIsland2("resources/objects/stylized_mini_floating_island/scene.gltf");
+    backgroundFloatingIsland1.SetShaderTextureNamePrefix("material.");
 
     //skyBox
 
@@ -285,12 +290,12 @@ int main() {
 
     vector<std::string> faces
             {
-                    FileSystem::getPath("resources/textures/dust_lf.jpg"),
-                    FileSystem::getPath("resources/textures/dust_rt.jpg"),
-                    FileSystem::getPath("resources/textures/dust_dn.jpg"),
-                    FileSystem::getPath("resources/textures/dust_up.jpg"),
-                    FileSystem::getPath("resources/textures/dust_ft.jpg"),
-                    FileSystem::getPath("resources/textures/dust_bk.jpg")
+                    FileSystem::getPath("resources/textures/skybox/right.jpg"),
+                    FileSystem::getPath("resources/textures/skybox/left.jpg"),
+                    FileSystem::getPath("resources/textures/skybox/bottom.jpg"),
+                    FileSystem::getPath("resources/textures/skybox/top.jpg"),
+                    FileSystem::getPath("resources/textures/skybox/front.jpg"),
+                    FileSystem::getPath("resources/textures/skybox/back.jpg")
             };
     unsigned int cubemapTexture = loadCubemap(faces);
 
@@ -337,10 +342,9 @@ int main() {
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
 
-        //????
         glDepthFunc(GL_LEQUAL);
 
-        // render the loaded model
+        //First small island render
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model,
                                glm::vec3 (68,-11+cos(currentFrame)*0.4f,20)); // translate it down so it's at the center of the scene
@@ -349,78 +353,59 @@ int main() {
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
 
-        //renderovanje drugog mini-floatin-island
+        //Second mini-floating island render
         glm::mat4 model0 = glm::mat4(1.0f);
         model0 = glm::translate(model0,
                                 glm::vec3 (86,-15+cos(currentFrame)*0.2f,32)); // translate it down so it's at the center of the scene
         model0 = glm::scale(model0, glm::vec3(0.08f));
-        //model0 = glm::rotate(model0, glm::radians(-40.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-        // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model0);
         ourModel.Draw(ourShader);
 
 
-        //hot air ballon render
-        glm::mat4 model1 = glm::mat4(1.0f);
-        model1 = glm::translate(model1,
-                                glm::vec3 (80,-13.2+cos(currentFrame)*0.2f,34)); // translate it down so it's at the center of the scene
-        model1 = glm::rotate(model1, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model1 = glm::scale(model1, glm::vec3(0.3f));
-        // it's a bit too big for our scene, so scale it down
-        ourShader.setMat4("model", model1);
-        floatingIslandModel.Draw(ourShader);
-
-
-        //air boy render
+        //Air boy render
         glm::mat4 model2 = glm::mat4(1.0f);
         model2 = glm::translate(model2,
                                 glm::vec3 (73,-8.6+cos(currentFrame)*0.4f,24));
-        //model2 = glm::rotate(model2, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         model2 = glm::scale(model2, glm::vec3(0.1f));
-        // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model2);
         airBoyModel.Draw(ourShader);
 
-        //base island
+        //Base island render
         glm::mat4 model3 = glm::mat4(1.0f);
         model3 = glm::translate(model3,
                                 glm::vec3 (70,-15+cos(currentFrame)*0.1f,40));
-        //model3 = glm::rotate(model2, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         model3 = glm::scale(model3, glm::vec3(0.9f));
-        // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model3);
         baseIsland.Draw(ourShader);
 
-        //model1 on base island
+        //Model1 on base island render
         glm::mat4 model4 = glm::mat4(1.0f);
         model4 = glm::translate(model4,
-                                glm::vec3 (67.3,-14+cos(currentFrame)*0.1f,40));
+                                glm::vec3 (67.3,-14+cos(currentFrame)*0.1f,40.8));
         model4 = glm::rotate(model4, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         model4 = glm::scale(model4, glm::vec3(0.01f));
-        // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model4);
         model1OnBaseIsland.Draw(ourShader);
 
-        //model2 on base island
+        //Model2 on base island render
         glm::mat4 model5 = glm::mat4(1.0f);
         model5 = glm::translate(model5,
-                                glm::vec3 (61.9,-9+cos(currentFrame)*1.4f,34.3));
+                                glm::vec3 (67,-9+cos(currentFrame)*1.4f,34.3));
         model5 = glm::rotate(model5, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        model5 = glm::scale(model5, glm::vec3(0.3f));
+        model5 = glm::scale(model5, glm::vec3(0.27f));
         ourShader.setMat4("model", model5);
         model2OnBaseIsland.Draw(ourShader);
 
-        //flying lighthouse render
+        //FLying lighthouse render
         glm::mat4 model6 = glm::mat4(1.0f);
         model6 = glm::translate(model6,
                                 glm::vec3 (86.2,-13.8+cos(currentFrame)*0.2f,40)); // translate it down so it's at the center of the scene
         model6 = glm::rotate(model6, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         model6 = glm::scale(model6, glm::vec3(0.03f));
-        // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model6);
         flyingLightHouse.Draw(ourShader);
 
-        //tree render
+        //Tree render
         glm::mat4 tree1 = glm::mat4(1.0f);
         tree1 = glm::translate(tree1,
                                glm::vec3 (89,-13.5+cos(currentFrame)*0.2f,32));
@@ -429,7 +414,7 @@ int main() {
         ourShader.setMat4("model", tree1);
         treeModel.Draw(ourShader);
 
-        //windmill render
+        //Windmill render
         glm::mat4 windmill = glm::mat4(1.0f);
         windmill = glm::translate(windmill,
                                   glm::vec3 (73,-10.5+cos(currentFrame)*0.1f,45));
@@ -439,7 +424,7 @@ int main() {
         ourShader.setMat4("model", windmill);
         windmillModel.Draw(ourShader);
 
-        //tree2 render
+        //Tree2 render
         glm::mat4 tree2 = glm::mat4(1.0f);
         tree2 = glm::translate(tree2,
                                glm::vec3 (75.5,-13.2+cos(currentFrame)*0.1f,46));
@@ -502,22 +487,18 @@ int main() {
                                 glm::vec3 (69,-8.4+cos(currentFrame)*0.4f,20));
         appa = glm::rotate(appa, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         appa = glm::scale(appa, glm::vec3(2.0f));
-        // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", appa);
         appaModel.Draw(ourShader);
 
 
-        //house render
-//        glm::mat4 house = glm::mat4(1.0f);
-//        house = glm::translate(house,
-//                              glm::vec3 (71.3,-13.4+cos(currentFrame)*0.1f,36));
-//        house = glm::rotate(house, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-//        house = glm::scale(house, glm::vec3(0.5));
-//        // it's a bit too big for our scene, so scale it down
-//        ourShader.setMat4("model", house);
-//        houseModel.Draw(ourShader);
-
-
+        //Big tree render
+        glm::mat4 bigTree = glm::mat4(1.0f);
+        bigTree = glm::translate(bigTree,
+                              glm::vec3 (63.7,-13.4+cos(currentFrame)*0.1f,35));
+        bigTree = glm::rotate(bigTree, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        bigTree = glm::scale(bigTree, glm::vec3(0.2));
+        ourShader.setMat4("model", bigTree);
+        bigTreeModel.Draw(ourShader);
 
 
         //blendovanje
@@ -534,9 +515,9 @@ int main() {
         // skybox cube
 
         skyboxShader.use();
-        view[3][0] = 0; // Postavljam x translaciju na nulu
-        view[3][1] = 0; // Postavljam y translaciju na nulu
-        view[3][2] = 0; // postavljam z translaciju na nulu
+        view[3][0] = 0;
+        view[3][1] = 0;
+        view[3][2] = 0;
         view[3][3] = 0;
         skyboxShader.setMat4("view", view);
         skyboxShader.setMat4("projection", projection);
