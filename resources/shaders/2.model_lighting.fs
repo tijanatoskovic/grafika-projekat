@@ -27,6 +27,7 @@ uniform PointLight pointLight;
 uniform Material material;
 
 uniform vec3 viewPosition;
+uniform bool blinn;
 // calculates the color when using a point light.
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
@@ -46,6 +47,17 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
+
+
+    //Blinn-Phong
+//         if(blinn){
+//             vec3 halfwayDir = normalize(lightDir + viewDir);
+//             spec = pow(max(dot(normal, halfwayDir),0.0), material.shininess);
+//         }else{
+//             spec = pow(max(dot(viewDir, reflectDir),0.0), material.shininess);
+//         }
+//         vec3 specular = light.specular * spec * texture(material.texture_specular1, TexCoords).rgb;
+
     return (ambient + diffuse + specular);
 }
 

@@ -42,6 +42,10 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+//Advanced lighting
+bool blinn = false;
+bool blinnKeyPressed = false;
+
 struct PointLight {
     glm::vec3 position;
     glm::vec3 ambient;
@@ -165,16 +169,11 @@ int main() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //face
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
-    glFrontFace(GL_CW);
-
     // build and compile shaders
     // -------------------------
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
     Shader skyboxShader("resources/shaders/skybox.vs", "resources/shaders/skybox.fs");
-    Shader blendingShader("resources/shaders/2.model_lighting.vs", "resources/shaders/blending.fs" );
+    Shader blendingShader("resources/shaders/blending.vs", "resources/shaders/blending.fs" );
     // load models
     // -----------
     Model ourModel("resources/objects/floating_island(1)/scene.gltf");
@@ -290,12 +289,12 @@ int main() {
 
     vector<std::string> faces
             {
-                    FileSystem::getPath("resources/textures/skybox/right.jpg"),
-                    FileSystem::getPath("resources/textures/skybox/left.jpg"),
-                    FileSystem::getPath("resources/textures/skybox/bottom.jpg"),
-                    FileSystem::getPath("resources/textures/skybox/top.jpg"),
-                    FileSystem::getPath("resources/textures/skybox/front.jpg"),
-                    FileSystem::getPath("resources/textures/skybox/back.jpg")
+                    FileSystem::getPath("resources/textures/miramar_lf.tga"),
+                    FileSystem::getPath("resources/textures/miramar_rt.tga"),
+                    FileSystem::getPath("resources/textures/miramar_dn.tga"),
+                    FileSystem::getPath("resources/textures/miramar_up.tga"),
+                    FileSystem::getPath("resources/textures/miramar_ft.tga"),
+                    FileSystem::getPath("resources/textures/miramar_bk.tga")
             };
     unsigned int cubemapTexture = loadCubemap(faces);
 
@@ -341,8 +340,15 @@ int main() {
         glm::mat4 view = programState->camera.GetViewMatrix();
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
+        //Blinn-phong
+        ourShader.setBool("blinn", blinn);
+        //std::cout << (blinn ? "Blinn-Phong" : "Phong") << std::endl;
 
         glDepthFunc(GL_LEQUAL);
+
+        //Face culling
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
 
         //First small island render
         glm::mat4 model = glm::mat4(1.0f);
@@ -446,8 +452,8 @@ int main() {
                                 glm::vec3 (69.4,-13.2+cos(currentFrame)*0.1f,45.2));
         tree22 = glm::rotate(tree22, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         tree22 = glm::scale(tree22, glm::vec3(0.03f));
-        ourShader.setMat4("model", tree22);
-        tree2Model.Draw(ourShader);
+        blendingShader.setMat4("model", tree22);
+        tree2Model.Draw(blendingShader);
 
         glm::mat4 tree23 = glm::mat4(1.0f);
         tree23 = glm::translate(tree23,
@@ -497,8 +503,8 @@ int main() {
                               glm::vec3 (63.7,-13.4+cos(currentFrame)*0.1f,35));
         bigTree = glm::rotate(bigTree, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         bigTree = glm::scale(bigTree, glm::vec3(0.2));
-        ourShader.setMat4("model", bigTree);
-        bigTreeModel.Draw(ourShader);
+        blendingShader.setMat4("model", bigTree);
+        bigTreeModel.Draw(blendingShader);
 
 
         //blendovanje
@@ -566,6 +572,15 @@ void processInput(GLFWwindow *window) {
         programState->camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         programState->camera.ProcessKeyboard(RIGHT, deltaTime);
+
+    //Blinn-Phong
+    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !blinnKeyPressed){
+        blinn = !blinn;
+        blinnKeyPressed = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_RELEASE){
+        blinnKeyPressed = false;
+    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -645,6 +660,9 @@ void DrawImGui(ProgramState *programState) {
         ImGui::ColorEdit3("Background color", (float *) &programState->clearColor);
         ImGui::DragFloat3("Backpack position", (float*)&programState->backpackPosition);
         ImGui::DragFloat("Backpack scale", &programState->backpackScale, 0.05, 0.1, 4.0);
+
+        ImGui::Bullet();
+        ImGui::Checkbox("Blinn-Phong (shortcut: B)", &blinn);
 
         ImGui::DragFloat("pointLight.constant", &programState->pointLight.constant, 0.05, 0.0, 1.0);
         ImGui::DragFloat("pointLight.linear", &programState->pointLight.linear, 0.05, 0.0, 1.0);
