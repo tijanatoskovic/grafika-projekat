@@ -179,9 +179,6 @@ int main() {
     Model ourModel("resources/objects/floating_island(1)/scene.gltf");
     ourModel.SetShaderTextureNamePrefix("material.");
 
-    Model floatingIslandModel("resources/objects/hot_air_balloon/scene.gltf");
-    floatingIslandModel.SetShaderTextureNamePrefix("material.");
-
     Model airBoyModel("resources/objects/airman/scene.gltf");
     airBoyModel.SetShaderTextureNamePrefix(("material."));
 
@@ -211,12 +208,6 @@ int main() {
 
     Model bigTreeModel("resources/objects/low_poly_tree_scene_free/scene.gltf");
     bigTreeModel.SetShaderTextureNamePrefix("material.");
-
-    Model backgroundFloatingIsland1("resources/objects/background_floating_islands/diorama_floating_islands__shrine/scene.gltf");
-    backgroundFloatingIsland1.SetShaderTextureNamePrefix("material.");
-
-    Model backgroundFloatingIsland2("resources/objects/stylized_mini_floating_island/scene.gltf");
-    backgroundFloatingIsland1.SetShaderTextureNamePrefix("material.");
 
     //skyBox
 
@@ -289,14 +280,16 @@ int main() {
 
     vector<std::string> faces
             {
-                    FileSystem::getPath("resources/textures/miramar_lf.tga"),
-                    FileSystem::getPath("resources/textures/miramar_rt.tga"),
-                    FileSystem::getPath("resources/textures/miramar_dn.tga"),
-                    FileSystem::getPath("resources/textures/miramar_up.tga"),
-                    FileSystem::getPath("resources/textures/miramar_ft.tga"),
-                    FileSystem::getPath("resources/textures/miramar_bk.tga")
+                    FileSystem::getPath("resources/textures/yonder_lf.jpg"),
+                    FileSystem::getPath("resources/textures/yonder_rt.jpg"),
+                    FileSystem::getPath("resources/textures/yonder_up.jpg"),
+                    FileSystem::getPath("resources/textures/yonder_dn.jpg"),
+                    FileSystem::getPath("resources/textures/yonder_ft.jpg"),
+                    FileSystem::getPath("resources/textures/yonder_bk.jpg")
             };
+    stbi_set_flip_vertically_on_load(false);
     unsigned int cubemapTexture = loadCubemap(faces);
+    stbi_set_flip_vertically_on_load(true);
 
     skyboxShader.use();
     skyboxShader.setInt("skybox", 0);
@@ -503,20 +496,9 @@ int main() {
                               glm::vec3 (63.7,-13.4+cos(currentFrame)*0.1f,35));
         bigTree = glm::rotate(bigTree, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         bigTree = glm::scale(bigTree, glm::vec3(0.2));
-        blendingShader.setMat4("model", bigTree);
-        bigTreeModel.Draw(blendingShader);
+        ourShader.setMat4("model", bigTree);
+        bigTreeModel.Draw(ourShader);
 
-
-        //blendovanje
-//        blendingShader.use();
-//        blendingShader.setVec3("viewPosition", programState->camera.Position);
-//        blendingShader.setFloat("material.shininess", 32.0f);
-//        blendingShader.setMat4("projection", projection);
-//        blendingShader.setMat4("view", view);
-//        blendingShader.setVec3("dirLight.direction", glm::vec3(-0.547f, -0.727f, 0.415f));
-//        blendingShader.setVec3("dirLight.ambient", glm::vec3(0.35f));
-//        blendingShader.setVec3("dirLight.diffuse", glm::vec3(0.4f));
-//        blendingShader.setVec3("dirLight.specular", glm::vec3(0.2f));
 
         // skybox cube
 

@@ -8,7 +8,7 @@ uniform mat4 view;
 
 void main()
 {
-    TexCoords = vec3(aPos.x, -aPos.y, aPos.z); // Rotacija za 180 stepeni zbog skyboxa
-    vec4 pos = projection * view * vec4(aPos, 1.0);
-    gl_Position = pos.xyww;
+     TexCoords = aPos;
+     vec4 pos = projection * view * vec4(aPos, 1.0);
+     gl_Position = pos.xyww;
 }
