@@ -173,7 +173,6 @@ int main() {
     // -------------------------
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
     Shader skyboxShader("resources/shaders/skybox.vs", "resources/shaders/skybox.fs");
-    Shader blendingShader("resources/shaders/blending.vs", "resources/shaders/blending.fs" );
     // load models
     // -----------
     Model ourModel("resources/objects/floating_island(1)/scene.gltf");
@@ -203,8 +202,8 @@ int main() {
     Model windmillModel("resources/objects/mill-wind/scene.gltf");
     windmillModel.SetShaderTextureNamePrefix("material.");
 
-    Model appaModel("resources/objects/appa_bison_4/scene.gltf");
-    appaModel.SetShaderTextureNamePrefix("material.");
+    Model giraffeModel("resources/objects/alpaca_non-commercial/scene.gltf");
+    giraffeModel.SetShaderTextureNamePrefix("material.");
 
     Model bigTreeModel("resources/objects/low_poly_tree_scene_free/scene.gltf");
     bigTreeModel.SetShaderTextureNamePrefix("material.");
@@ -259,8 +258,8 @@ int main() {
 
     PointLight& pointLight = programState->pointLight;
     pointLight.position = glm::vec3(4.0f, 4.0, 0.0);
-    pointLight.ambient = glm::vec3(0.1, 0.1, 0.1);
-    pointLight.diffuse = glm::vec3(1, 1, 1);
+    pointLight.ambient = glm::vec3(0.25, 0.25, 0.25);
+    pointLight.diffuse = glm::vec3(1.0, 1.0, 1.0);
     pointLight.specular = glm::vec3(1.0, 1.0, 1.0);
 
     pointLight.constant = 1.0f;
@@ -280,12 +279,12 @@ int main() {
 
     vector<std::string> faces
             {
-                    FileSystem::getPath("resources/textures/yonder_lf.jpg"),
-                    FileSystem::getPath("resources/textures/yonder_rt.jpg"),
-                    FileSystem::getPath("resources/textures/yonder_up.jpg"),
-                    FileSystem::getPath("resources/textures/yonder_dn.jpg"),
-                    FileSystem::getPath("resources/textures/yonder_ft.jpg"),
-                    FileSystem::getPath("resources/textures/yonder_bk.jpg")
+                    FileSystem::getPath("resources/textures/miramar_lf.jpg"),
+                    FileSystem::getPath("resources/textures/miramar_rt.jpg"),
+                    FileSystem::getPath("resources/textures/miramar_up.jpg"),
+                    FileSystem::getPath("resources/textures/miramar_dn.jpg"),
+                    FileSystem::getPath("resources/textures/miramar_ft.jpg"),
+                    FileSystem::getPath("resources/textures/miramar_bk.jpg")
             };
     stbi_set_flip_vertically_on_load(false);
     unsigned int cubemapTexture = loadCubemap(faces);
@@ -317,7 +316,7 @@ int main() {
 
         // don't forget to enable shader before setting uniforms
         ourShader.use();
-        pointLight.position = glm::vec3(4.0 , 4.0f, 4.0 );
+        pointLight.position = glm::vec3(3.0 , 3.0f, 3.0 );
         ourShader.setVec3("pointLight.position", pointLight.position);
         ourShader.setVec3("pointLight.ambient", pointLight.ambient);
         ourShader.setVec3("pointLight.diffuse", pointLight.diffuse);
@@ -333,9 +332,6 @@ int main() {
         glm::mat4 view = programState->camera.GetViewMatrix();
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
-        //Blinn-phong
-        ourShader.setBool("blinn", blinn);
-        //std::cout << (blinn ? "Blinn-Phong" : "Phong") << std::endl;
 
         glDepthFunc(GL_LEQUAL);
 
@@ -389,7 +385,7 @@ int main() {
         //Model2 on base island render
         glm::mat4 model5 = glm::mat4(1.0f);
         model5 = glm::translate(model5,
-                                glm::vec3 (67,-9+cos(currentFrame)*1.4f,34.3));
+                                glm::vec3 (67,-9+cos(currentFrame)*2.0f,34.3));
         model5 = glm::rotate(model5, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         model5 = glm::scale(model5, glm::vec3(0.27f));
         ourShader.setMat4("model", model5);
@@ -418,7 +414,7 @@ int main() {
         windmill = glm::translate(windmill,
                                   glm::vec3 (73,-10.5+cos(currentFrame)*0.1f,45));
         windmill = glm::scale(windmill, glm::vec3(0.4f));
-        windmill = glm::rotate(windmill, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        //windmill = glm::rotate(windmill, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         windmill = glm::rotate(windmill, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         ourShader.setMat4("model", windmill);
         windmillModel.Draw(ourShader);
@@ -426,7 +422,7 @@ int main() {
         //Tree2 render
         glm::mat4 tree2 = glm::mat4(1.0f);
         tree2 = glm::translate(tree2,
-                               glm::vec3 (75.5,-13.2+cos(currentFrame)*0.1f,46));
+                               glm::vec3 (75.5,-13.2+cos(currentFrame)*0.1f,43));
         tree2 = glm::rotate(tree2, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         tree2 = glm::scale(tree2, glm::vec3(0.03f));
         ourShader.setMat4("model", tree2);
@@ -434,7 +430,7 @@ int main() {
 
         glm::mat4 tree21 = glm::mat4(1.0f);
         tree21 = glm::translate(tree21,
-                                glm::vec3 (72.2,-13.5+cos(currentFrame)*0.1f,48.5));
+                                glm::vec3 (70.4,-13.5+cos(currentFrame)*0.1f,46));
         tree21 = glm::rotate(tree21, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         tree21 = glm::scale(tree21, glm::vec3(0.025f));
         ourShader.setMat4("model", tree21);
@@ -445,12 +441,12 @@ int main() {
                                 glm::vec3 (69.4,-13.2+cos(currentFrame)*0.1f,45.2));
         tree22 = glm::rotate(tree22, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         tree22 = glm::scale(tree22, glm::vec3(0.03f));
-        blendingShader.setMat4("model", tree22);
-        tree2Model.Draw(blendingShader);
+        ourShader.setMat4("model", tree22);
+        tree2Model.Draw(ourShader);
 
         glm::mat4 tree23 = glm::mat4(1.0f);
         tree23 = glm::translate(tree23,
-                                glm::vec3 (74,-13.2+cos(currentFrame)*0.1f,47.4));
+                                glm::vec3 (74,-13.2+cos(currentFrame)*0.1f,42));
         tree23 = glm::rotate(tree23, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         tree23 = glm::scale(tree23, glm::vec3(0.008f));
         ourShader.setMat4("model", tree23);
@@ -480,14 +476,13 @@ int main() {
         ourShader.setMat4("model", tree13);
         tree2Model.Draw(ourShader);
 
-        //Appa render
-        glm::mat4 appa = glm::mat4(1.0f);
-        appa = glm::translate(appa,
-                                glm::vec3 (69,-8.4+cos(currentFrame)*0.4f,20));
-        appa = glm::rotate(appa, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        appa = glm::scale(appa, glm::vec3(2.0f));
-        ourShader.setMat4("model", appa);
-        appaModel.Draw(ourShader);
+        //Giraffe-alpaca render
+        glm::mat4 giraffe = glm::mat4(1.0f);
+        giraffe = glm::translate(giraffe,
+                                glm::vec3 (69,-9.25+cos(currentFrame)*0.4f,20));
+        giraffe = glm::scale(giraffe, glm::vec3(0.5f));
+        ourShader.setMat4("model", giraffe);
+        giraffeModel.Draw(ourShader);
 
 
         //Big tree render
