@@ -33,7 +33,7 @@ void renderQuad();
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-float heightScale = 0.1f;
+float heightScale = 0.001f;
 
 // camera
 
@@ -217,11 +217,12 @@ int main() {
     unsigned int daVinciDiffuse = loadTexture(FileSystem::getPath("resources/objects/da_vincis_-_flying_machine/textures/lambert14_baseColor.jpeg").c_str(), true);
     unsigned int daVinciSpecular = loadTexture(FileSystem::getPath("resources/textures/daVinciSpecularMap.png").c_str(), false);
     unsigned int daVinciNormal = loadTexture(FileSystem::getPath("resources/textures/daVinci.png").c_str(), false);
-    //unsigned int daVinciDisp = loadTexture(FileSystem::getPath("").c_str(), false);
+    unsigned int daVinciDisp = loadTexture(FileSystem::getPath("resources/textures/DisplacementMap_daVinci.png").c_str(), false);
+
     unsigned int millwindDiffuse = loadTexture(FileSystem::getPath("resources/objects/mill-wind/textures/Texture-base_baseColor.jpeg").c_str(), true);
     unsigned int millwindSpecular = loadTexture(FileSystem::getPath("resources/textures/millwindSpecularMap.png").c_str(), false);
     unsigned int millwindNormal = loadTexture(FileSystem::getPath("resources/textures/millWind.png").c_str(), false);
-
+    unsigned int millwindDisp = loadTexture(FileSystem::getPath("resources/textures/DisplacementMap_millwind.png").c_str(), false);
 
 
     //skyBox
@@ -342,7 +343,6 @@ int main() {
         normalMapping.setFloat("pointLight.quadratic", pointLight.quadratic);
         normalMapping.setVec3("viewPos", programState->camera.Position);
         normalMapping.setFloat("material.shininess", 32.0f);
-        normalMapping.setBool("blinn",true);
         normalMapping.setVec3("spotLight.position", glm::vec3(5.0f));
         normalMapping.setVec3("spotLight.direction", glm::vec3(-5.0f));
         normalMapping.setVec3("spotLight.ambient", glm::vec3(0.1f,0.1f,0.1f));
@@ -357,6 +357,7 @@ int main() {
         normalMapping.setVec3("dirLight.ambient", glm::vec3(0.1f,0.1f,0.1f));
         normalMapping.setVec3("dirLight.diffuse", glm::vec3(0.5f,0.3f,0.3f));
         normalMapping.setVec3("dirLight.specular", glm::vec3(0.2f,0.2f,0.2f));
+        normalMapping.setFloat("heightScale",heightScale);
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(programState->camera.Zoom),
                                                 (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 100.0f);
@@ -375,6 +376,7 @@ int main() {
         normalMapping.setInt("material.diffuse", 0);
         normalMapping.setInt("material.specular", 1);
         normalMapping.setInt("material.normal", 2);
+        normalMapping.setInt("material.texture_depth", 3);
         // bind diffuse map
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, daVinciDiffuse);
@@ -384,6 +386,9 @@ int main() {
         // bind normal map
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, daVinciNormal);
+        // bind displacment map
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, daVinciDisp);
         renderQuad();
         model2OnBaseIsland.Draw(normalMapping);
 
@@ -404,6 +409,9 @@ int main() {
         // bind normal map
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, millwindNormal);
+        // bind displacment map
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, millwindDisp);
         renderQuad();
 
         windmillModel.Draw(normalMapping);
