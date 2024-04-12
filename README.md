@@ -1,10 +1,10 @@
 # Feel Good Inc 
 # Keyboard instructions:  
 Moving:  
-[W] - forwards  
-[S] - backwards  
-[A] - left   
-[D] - right  
+`W` - forwards  
+`S` - backwards  
+`A` - left   
+`D` - right  
 # Implemented techniques:  
 - Required:
     - Blending
