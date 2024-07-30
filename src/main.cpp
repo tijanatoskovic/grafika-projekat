@@ -177,6 +177,11 @@ int main() {
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
     Shader skyboxShader("resources/shaders/skybox.vs", "resources/shaders/skybox.fs");
     Shader normalMapping("resources/shaders/materialVertexShader.vs", "resources/shaders/materialFragmentShader.fs");
+    Shader shader("bloom.vs", "bloom.fs");
+    Shader shaderLight("bloom.vs", "light_box.fs");
+    Shader shaderBlur("blur.vs", "blur.fs");
+    Shader shaderBloomFinal("bloom_final.vs", "bloom_final.fs");
+
     // load models
     // -----------
     Model ourModel("resources/objects/floating_island(1)/scene.gltf");
