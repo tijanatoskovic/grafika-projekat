@@ -389,7 +389,7 @@ int main() {
         // bind displacment map
         glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, daVinciDisp);
-        renderQuad();
+        //renderQuad();
         model2OnBaseIsland.Draw(normalMapping);
 
         //Windmill render
@@ -412,7 +412,7 @@ int main() {
         // bind displacment map
         glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, millwindDisp);
-        renderQuad();
+        //renderQuad();
 
         windmillModel.Draw(normalMapping);
 

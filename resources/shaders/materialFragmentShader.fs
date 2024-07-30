@@ -53,7 +53,6 @@ struct SpotLight {
     vec3 specular;
 };
 
-
 uniform Material material;
 uniform vec3 viewPos;
 
@@ -114,6 +113,7 @@ void main()
 
     vec2 texCoords = fs_in.TexCoords;
     texCoords = ParallaxMapping(fs_in.TexCoords,  viewDir);
+    //we discard the fragments whose textCoords are not in the interval [0,1]
     if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
         discard;
 
@@ -121,8 +121,6 @@ void main()
     vec3 norm = texture(material.texture_normal, texCoords).rgb;
     // transform normal vector to range [-1,1]
     norm = normalize(norm * 2.0 - 1.0);  // this normal is in tangent space
-
-
 
     vec4 result = vec4(0.0f);
 
@@ -133,7 +131,6 @@ void main()
     FragColor = result;
 }
 
-//DIRECTIONAL LIGHT
 vec4 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, vec2 texCoords)
 {
     vec3 lightDir = normalize(-light.direction);
@@ -143,7 +140,8 @@ vec4 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, vec2 texCoords)
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = 0;
     vec3 halfwayDir = normalize(lightDir + viewDir);
-    spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
+    spec = pow(max(dot(normal, halfwayDir), 0.0), material.
+    ness);
 
 
     // combine results
@@ -153,7 +151,6 @@ vec4 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, vec2 texCoords)
     return (ambient + diffuse + specular);
 }
 
-//POINT LIGHT
 vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec2 texCoords)
 {
     vec3 lightDir = normalize(fs_in.TangentPointLightPos - fs_in.TangentFragPos);
@@ -176,7 +173,6 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, v
     return (ambient + diffuse + specular);
 }
 
-//SPOT LIGHT
 vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec2 texCoords)
 {
    vec3 lightDir = normalize(fs_in.TangentSpotLightPos - fs_in.TangentFragPos);
