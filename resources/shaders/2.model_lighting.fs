@@ -3,11 +3,9 @@ out vec4 FragColor;
 
 struct PointLight {
     vec3 position;
-
     vec3 specular;
     vec3 diffuse;
     vec3 ambient;
-
     float constant;
     float linear;
     float quadratic;
@@ -15,7 +13,6 @@ struct PointLight {
 
 struct DirLight {
     vec3 direction;
-
     vec3 specular;
     vec3 diffuse;
     vec3 ambient;
@@ -26,7 +23,7 @@ struct Material {
     sampler2D texture_specular1;
 
     float shininess;
-    float shininessBP;  // Blinn-Phong shininess
+    float shininessBP;
 };
 
 in vec2 TexCoords;
@@ -48,14 +45,12 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     // specular shading
     float spec = 0.0;
     if(blinn) {
-        // halfway direction vector for Blinn-Phong
         vec3 halfDir = normalize(lightDir + viewDir);
         spec = pow(max(dot(normal, halfDir), 0.0), material.shininessBP);
     } else {
         vec3 reflectDir = reflect(-lightDir, normal);
         spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     }
-
     // attenuation
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
@@ -91,10 +86,8 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = 0.0f;
 
-    // Blinn-Phong
     vec3 halfwayDir = normalize(lightDir + viewDir);
     spec = pow(max(dot(normal, halfwayDir),0.0), material.shininess);
-
     vec3 specular = light.specular * spec * texture(material.texture_specular1, TexCoords).rgb;
 
     return (ambient + diffuse + specular);

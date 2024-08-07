@@ -30,6 +30,7 @@ unsigned int loadCubemap(vector<std::string> faces);
 unsigned int loadTexture(const char *path);
 
 void renderQuad();
+void renderCube();
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -192,6 +193,7 @@ int main() {
     Shader shaderBlur("resources/shaders/blur.vs", "resources/shaders/blur.fs");
     Shader shaderBloomFinal("resources/shaders/bloom_final.vs", "resources/shaders/bloom_final.fs");
     Shader shaderBloom("resources/shaders/bloom.vs", "resources/shaders/bloom.fs");
+    Shader shaderLight("resources/shaders/bloom.vs", "resources/shaders/light_box.fs");
 
     //Shader hdrShader("resources/shaders/hdr.vs", "resources/shaders/hdr.fs");
 
@@ -231,7 +233,6 @@ int main() {
     bigTreeModel.SetShaderTextureNamePrefix("material.");
 
     //skyBox
-
     float skyboxVertices[] = {
             // positions
             -1.0f,  1.0f, -1.0f,
@@ -314,7 +315,7 @@ int main() {
 
     pointLight.constant = 1.0f;
     pointLight.linear = 0.0f;
-    pointLight.quadratic = 0.0f;
+    pointLight.quadratic = 0.25f;
 
     DirLight& dirLight = programState->dirLight;
     dirLight.direction = glm::vec3(-4.0f, 0.0f, 0.0f);
@@ -322,6 +323,19 @@ int main() {
     dirLight.diffuse = glm::vec3(0.4f);
     dirLight.specular = glm::vec3(0.5f);
 
+    // lıght boxes positions
+    std::vector<glm::vec3> lightPositions;
+    lightPositions.push_back(glm::vec3(85.0f, -13.0f, 32.0f));
+//    lightPositions.push_back(glm::vec3(-2.0f, 4.5f, -7.3f));
+//    lightPositions.push_back(glm::vec3(2.0f, 4.5f, -7.2f));
+//    lightPositions.push_back(glm::vec3(6.0f, 4.5f, -5.0f));
+
+    // colors
+    std::vector<glm::vec3> lightColors;
+    lightColors.push_back(glm::vec3(5.0f, 5.0f, 5.0f));
+//    lightColors.push_back(glm::vec3(5.0f, 5.0f, 5.0f));
+//    lightColors.push_back(glm::vec3(5.0f, 5.0f, 5.0f));
+//    lightColors.push_back(glm::vec3(5.0f, 5.0f, 5.0f));
 
     //bloom
     // configure (floating point) framebuffers
@@ -387,6 +401,9 @@ int main() {
     shaderBloomFinal.use();
     shaderBloomFinal.setInt("scene", 0);
     shaderBloomFinal.setInt("bloomBlur", 1);
+
+    // lighting info
+    glm::vec3 lightPos(-2.0f, 3.0f, -9.3f);
 
     // render loop
     // -----------
@@ -585,6 +602,35 @@ int main() {
         bigTree = glm::scale(bigTree, glm::vec3(0.2));
         ourShader.setMat4("model", bigTree);
         bigTreeModel.Draw(ourShader);
+
+        projection = glm::perspective(glm::radians(programState->camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        view = programState->camera.GetViewMatrix();
+        shaderBloom.use();
+        shaderBloom.setMat4("projection", projection);
+        shaderBloom.setMat4("view", view);
+
+        // set lighting uniforms
+        for (unsigned int i = 0; i < lightPositions.size(); i++) {
+            shaderBloom.setVec3("lights[" + std::to_string(i) + "].Position", lightPositions[i]);
+            shaderBloom.setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);
+        }
+        shaderBloom.setVec3("viewPos", programState->camera.Position);
+
+        // light sources as white cubes
+        shaderLight.use();
+        shaderLight.setMat4("projection", projection);
+        shaderLight.setMat4("view", view);
+
+        for (unsigned int i = 0; i < lightPositions.size(); i++) {
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(lightPositions[i]) + glm::vec3(0.0f, cos(currentFrame), 0.0f));
+            model = glm::scale(model, glm::vec3(0.18f));
+            shaderLight.setMat4("model", model);
+            shaderLight.setVec3("lightColor", lightColors[i]);
+            renderCube();
+        }
+
+        glDisable(GL_CULL_FACE);
 
 
         // skybox cube
@@ -852,5 +898,79 @@ void renderQuad() {
     }
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+}
+
+// renderCube() renders a 1x1 3D cube in NDC.
+unsigned int cubeVAO = 0;
+unsigned int cubeVBO = 0;
+void renderCube()
+{
+    // initialize (if necessary)
+    if (cubeVAO == 0) {
+        float vertices[] = {
+                // back face
+                -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+                1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
+                1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right
+                1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
+                -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+                -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left
+                // front face
+                -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+                1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
+                1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+                1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+                -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
+                -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+                // left face
+                -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
+                -1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left
+                -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
+                -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
+                -1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+                -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
+                // right face
+                1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
+                1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+                1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right
+                1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+                1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
+                1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left
+                // bottom face
+                -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
+                1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left
+                1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
+                1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
+                -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+                -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
+                // top face
+                -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+                1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+                1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right
+                1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+                -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+                -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left
+        };
+
+        glGenVertexArrays(1, &cubeVAO);
+        glGenBuffers(1, &cubeVBO);
+        // fill buffer
+        glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        // link vertex attributes
+        glBindVertexArray(cubeVAO);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
+    // render Cube
+    glBindVertexArray(cubeVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
 }
