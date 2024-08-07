@@ -314,7 +314,7 @@ int main() {
 
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+//----------------------------------------------------------------------------------
     PointLight& pointLight = programState->pointLight;
     pointLight.position = glm::vec3(4.0f, 4.0, 4.0);
     pointLight.ambient = glm::vec3(0.1, 0.1, 0.1);
@@ -326,7 +326,7 @@ int main() {
     pointLight.quadratic = 0.0f;
 
     DirLight& dirLight = programState->dirLight;
-    dirLight.direction = glm::vec3(4.0f, 0.0f, 0.0f);
+    dirLight.direction = glm::vec3(4.0f, -10.0f, 0.0f);
     dirLight.ambient = glm::vec3(0.02f);
     dirLight.diffuse = glm::vec3(0.05f);
     dirLight.specular = glm::vec3(0.3f);
@@ -341,7 +341,7 @@ int main() {
     std::vector<glm::vec3> lightColors;
     lightColors.push_back(glm::vec3(5.0f, 5.0f, 5.0f));
     lightColors.push_back(glm::vec3(5.0f, 5.0f, 5.0f));
-
+//-----------------------------------------------------------------------------------
     //bloom
     // configure (floating point) framebuffers
     // ---------------------------------------
@@ -396,17 +396,7 @@ int main() {
             std::cout << "Framebuffer not complete!" << std::endl;
     }
 
-
-    // shader configuration
-    // --------------------
-    shaderBloom.use();
-    shaderBloom.setInt("diffuseTexture", 0);
-    shaderBlur.use();
-    shaderBlur.setInt("image", 0);
-    shaderBloomFinal.use();
-    shaderBloomFinal.setInt("scene", 0);
-    shaderBloomFinal.setInt("bloomBlur", 1);
-
+//----------------------------------------------------------------------------------------
     //ssao
     // configure g-buffer framebuffer
     // ------------------------------
@@ -517,8 +507,17 @@ int main() {
     glm::vec3 lightPos = glm::vec3(2.0, 4.0, -2.0);
     glm::vec3 lightColor = glm::vec3(0.2, 0.2, 0.7);
 
+//----------------------------------------------------------------------------------------
     // shader configuration
     // --------------------
+    shaderBloom.use();
+    shaderBloom.setInt("diffuseTexture", 0);
+    shaderBlur.use();
+    shaderBlur.setInt("image", 0);
+    shaderBloomFinal.use();
+    shaderBloomFinal.setInt("scene", 0);
+    shaderBloomFinal.setInt("bloomBlur", 1);
+
     shaderLightingPass.use();
     shaderLightingPass.setInt("gPosition", 0);
     shaderLightingPass.setInt("gNormal", 1);
@@ -776,10 +775,6 @@ int main() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
-        if (programState->ImGuiEnabled)
-            DrawImGui(programState);
-
-
         // 2. generate SSAO texture
         // ------------------------
 //        glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
@@ -863,6 +858,8 @@ int main() {
         shaderBloomFinal.setFloat("exposure", exposure);
         renderQuad();
 
+        if (programState->ImGuiEnabled)
+            DrawImGui(programState);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
