@@ -331,10 +331,11 @@ int main() {
     dirLight.diffuse = glm::vec3(0.05f);
     dirLight.specular = glm::vec3(0.3f);
 
-    // lıght boxes positions
-    std::vector<glm::vec3> lightPositions;
-    lightPositions.push_back(glm::vec3(86.26f, -8.57f, 39.7f));
-    lightPositions.push_back(glm::vec3(67.46f, -6.93f, 39.86f));
+
+    //positions of the point lights
+    std::vector<glm::vec3> pointLightPositions;
+    pointLightPositions.push_back(glm::vec3(86.26f, -8.57f, 39.7f));
+    pointLightPositions.push_back(glm::vec3(67.46f, -6.93f, 39.86f));
 
 
     // colors
@@ -583,6 +584,24 @@ int main() {
         ourShader.setVec3("dirLight.diffuse", dirLight.diffuse);
         ourShader.setVec3("dirLight.specular", dirLight.specular);
 
+        // point light 1
+        ourShader.setVec3("pointLights[0].position", pointLightPositions[0]);
+        ourShader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+        ourShader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+        ourShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+        ourShader.setFloat("pointLights[0].constant", 4.0f);
+        ourShader.setFloat("pointLights[0].linear", 0.0f);
+        ourShader.setFloat("pointLights[0].quadratic", 0.0f);
+        // point light 2
+        ourShader.setVec3("pointLights[1].position", pointLightPositions[1]);
+        ourShader.setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+        ourShader.setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
+        ourShader.setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+        ourShader.setFloat("pointLights[1].constant", 4.0f);
+        ourShader.setFloat("pointLights[1].linear", 0.0f);
+        ourShader.setFloat("pointLights[1].quadratic", 0.0f);
+
+
         glDepthFunc(GL_LEQUAL);
 
         //Face culling
@@ -734,8 +753,8 @@ int main() {
         shaderBloom.setMat4("view", view);
 
         // set lighting uniforms
-        for (unsigned int i = 0; i < lightPositions.size(); i++) {
-            shaderBloom.setVec3("lights[" + std::to_string(i) + "].Position", lightPositions[i]);
+        for (unsigned int i = 0; i < pointLightPositions.size(); i++) {
+            shaderBloom.setVec3("lights[" + std::to_string(i) + "].Position", pointLightPositions[i]);
             shaderBloom.setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);
         }
         shaderBloom.setVec3("viewPos", programState->camera.Position);
@@ -745,9 +764,9 @@ int main() {
         shaderLight.setMat4("projection", projection);
         shaderLight.setMat4("view", view);
 
-        for (unsigned int i = 0; i < lightPositions.size(); i++) {
+        for (unsigned int i = 0; i < pointLightPositions.size(); i++) {
             model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(lightPositions[i]) + glm::vec3(0.0f, cos(currentFrame)*0.1f, 0.0f));
+            model = glm::translate(model, glm::vec3(pointLightPositions[i]) + glm::vec3(0.0f, cos(currentFrame)*0.1f, 0.0f));
             model = glm::scale(model, glm::vec3(0.18f));
             shaderLight.setMat4("model", model);
             shaderLight.setVec3("lightColor", lightColors[i]);
@@ -775,60 +794,6 @@ int main() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
-        // 2. generate SSAO texture
-        // ------------------------
-//        glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
-//        glClear(GL_COLOR_BUFFER_BIT);
-//        shaderSSAO.use();
-//        // Send kernel + rotation
-//        for (unsigned int i = 0; i < 64; ++i)
-//            shaderSSAO.setVec3("samples[" + std::to_string(i) + "]", ssaoKernel[i]);
-//        shaderSSAO.setMat4("projection", projection);
-//        glActiveTexture(GL_TEXTURE0);
-//        glBindTexture(GL_TEXTURE_2D, gPosition);
-//        glActiveTexture(GL_TEXTURE1);
-//        glBindTexture(GL_TEXTURE_2D, gNormal);
-//        glActiveTexture(GL_TEXTURE2);
-//        glBindTexture(GL_TEXTURE_2D, noiseTexture);
-//        renderQuad();
-//        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-        // 3. blur SSAO texture to remove noise
-        // ------------------------------------
-//        glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
-//        glClear(GL_COLOR_BUFFER_BIT);
-//        shaderSSAOBlur.use();
-//        glActiveTexture(GL_TEXTURE0);
-//        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-//        renderQuad();
-//        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-        // 4. lighting pass: traditional deferred Blinn-Phong lighting with added screen-space ambient occlusion
-        // -----------------------------------------------------------------------------------------------------
-//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//        shaderLightingPass.use();
-//        // send light relevant uniforms
-//        glm::vec3 lightPosView = glm::vec3(camera.GetViewMatrix() * glm::vec4(lightPos, 1.0));
-//        shaderLightingPass.setVec3("light.Position", lightPosView);
-//        shaderLightingPass.setVec3("light.Color", lightColor);
-//        // Update attenuation parameters
-//        const float linear    = 0.09f;
-//        const float quadratic = 0.032f;
-//        shaderLightingPass.setFloat("light.Linear", linear);
-//        shaderLightingPass.setFloat("light.Quadratic", quadratic);
-//        glActiveTexture(GL_TEXTURE0);
-//        glBindTexture(GL_TEXTURE_2D, gPosition);
-//        glActiveTexture(GL_TEXTURE1);
-//        glBindTexture(GL_TEXTURE_2D, gNormal);
-//        glActiveTexture(GL_TEXTURE2);
-//        glBindTexture(GL_TEXTURE_2D, gAlbedo);
-//        glActiveTexture(GL_TEXTURE3); // add extra SSAO texture to lighting pass
-//        glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
-//        renderQuad();
-
-
         // 2. blur bright fragments with two-pass Gaussian Blur
         // --------------------------------------------------
         bool horizontal = true, first_iteration = true;
@@ -845,6 +810,59 @@ int main() {
                 first_iteration = false;
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // 2. generate SSAO texture
+        // ------------------------
+        glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+        glClear(GL_COLOR_BUFFER_BIT);
+        shaderSSAO.use();
+        // Send kernel + rotation
+        for (unsigned int i = 0; i < 64; ++i)
+            shaderSSAO.setVec3("samples[" + std::to_string(i) + "]", ssaoKernel[i]);
+        shaderSSAO.setMat4("projection", projection);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, gPosition);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, gNormal);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, noiseTexture);
+        renderQuad();
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+        // 3. blur SSAO texture to remove noise
+        // ------------------------------------
+        glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
+        glClear(GL_COLOR_BUFFER_BIT);
+        shaderSSAOBlur.use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+        renderQuad();
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+        // 4. lighting pass: traditional deferred Blinn-Phong lighting with added screen-space ambient occlusion
+        // -----------------------------------------------------------------------------------------------------
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        shaderLightingPass.use();
+        // send light relevant uniforms
+        glm::vec3 lightPosView = glm::vec3(camera.GetViewMatrix() * glm::vec4(lightPos, 1.0));
+        shaderLightingPass.setVec3("light.Position", lightPosView);
+        shaderLightingPass.setVec3("light.Color", lightColor);
+        // Update attenuation parameters
+        const float linear    = 0.09f;
+        const float quadratic = 0.032f;
+        shaderLightingPass.setFloat("light.Linear", linear);
+        shaderLightingPass.setFloat("light.Quadratic", quadratic);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, gPosition);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, gNormal);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, gAlbedo);
+        glActiveTexture(GL_TEXTURE3); // add extra SSAO texture to lighting pass
+        glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+        renderQuad();
 
         // 3. now render floating point color buffer to 2D quad and tonemap HDR colors to default framebuffer's (clamped) color range
         // --------------------------------------------------------------------------------------------------------------------------
