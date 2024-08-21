@@ -316,9 +316,9 @@ int main() {
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 //----------------------------------------------------------------------------------
     PointLight& pointLight = programState->pointLight;
-    pointLight.position = glm::vec3(4.0f, 4.0, 4.0);
-    pointLight.ambient = glm::vec3(0.1, 0.1, 0.1);
-    pointLight.diffuse = glm::vec3(0.4, 0.4, 0.4);
+    pointLight.position = glm::vec3(4.0f, 4.0, 0.0);
+    pointLight.ambient = glm::vec3(0.05, 0.05, 0.05);
+    pointLight.diffuse = glm::vec3(1.0, 1.0, 1.0);
     pointLight.specular = glm::vec3(1.0, 1.0, 1.0);
 
     pointLight.constant = 4.0f;
@@ -326,10 +326,10 @@ int main() {
     pointLight.quadratic = 0.0f;
 
     DirLight& dirLight = programState->dirLight;
-    dirLight.direction = glm::vec3(4.0f, -10.0f, 0.0f);
+    dirLight.direction = glm::vec3(14.0f, 0.0f, 0.0f);
     dirLight.ambient = glm::vec3(0.02f);
-    dirLight.diffuse = glm::vec3(0.05f);
-    dirLight.specular = glm::vec3(0.3f);
+    dirLight.diffuse = glm::vec3(0.5f);
+    dirLight.specular = glm::vec3(1.0f);
 
 
     //positions of the point lights
