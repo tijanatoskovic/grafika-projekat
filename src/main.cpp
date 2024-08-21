@@ -322,13 +322,13 @@ int main() {
     pointLight.specular = glm::vec3(1.0, 1.0, 1.0);
 
     pointLight.constant = 4.0f;
-    pointLight.linear = 0.0f;
-    pointLight.quadratic = 0.0f;
+    pointLight.linear = 0.5f;
+    pointLight.quadratic = 0.5f;
 
     DirLight& dirLight = programState->dirLight;
     dirLight.direction = glm::vec3(14.0f, 0.0f, 0.0f);
     dirLight.ambient = glm::vec3(0.02f);
-    dirLight.diffuse = glm::vec3(0.5f);
+    dirLight.diffuse = glm::vec3(0.0f);
     dirLight.specular = glm::vec3(1.0f);
 
 
