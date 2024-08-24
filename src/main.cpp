@@ -219,8 +219,10 @@ int main() {
     Model baseIsland("resources/objects/base_island/scene.gltf");
     baseIsland.SetShaderTextureNamePrefix("material.");
 
+    stbi_set_flip_vertically_on_load(false);
     Model model1OnBaseIsland("resources/objects/steampunk_lighthouse/scene.gltf");
     model1OnBaseIsland.SetShaderTextureNamePrefix("material.");
+    stbi_set_flip_vertically_on_load(true);
 
     Model model2OnBaseIsland("resources/objects/da_vincis_-_flying_machine/scene.gltf");
     model2OnBaseIsland.SetShaderTextureNamePrefix("material.");
@@ -230,9 +232,6 @@ int main() {
 
     Model tree2Model("resources/objects/trees_low_poly/scene.gltf");
     tree2Model.SetShaderTextureNamePrefix("material.");
-
-    Model windmillModel("resources/objects/mill-wind/scene.gltf");
-    windmillModel.SetShaderTextureNamePrefix("material.");
 
     Model giraffeModel("resources/objects/alpaca_non-commercial/scene.gltf");
     giraffeModel.SetShaderTextureNamePrefix("material.");
