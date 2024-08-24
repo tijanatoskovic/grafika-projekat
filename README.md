@@ -14,7 +14,8 @@ Moving:
 - Group A:
     - Cubemaps - skybox
 - Group B:
-    - Normal mapping, Parallex mapping
+    - HDR, Bloom
+    - SSAO
 
 
 # Computer Graphics
@@ -22,8 +23,10 @@ Year: 2023/2024
 Teaching Assistant: Marko Spasić  
 Professor: Vesna Marinković   
 
-# Gallery   
-![Screenshot from 2024-04-11 19-52-21](https://github.com/tijanatoskovic/grafika-projekat/assets/119348671/6219fff9-4050-4470-9783-e074ec64d963)          
-![Screenshot from 2024-04-11 19-50-35](https://github.com/tijanatoskovic/grafika-projekat/assets/119348671/47ad9e56-62e4-4927-9b56-4bb44b900ec2)
+# Gallery  
+![Screenshot from 2024-08-24 10-33-41](https://github.com/user-attachments/assets/eed978ca-f898-4289-83ab-3eb2cf6621b2)
+![Screenshot from 2024-08-24 10-35-22](https://github.com/user-attachments/assets/e75ebeff-8b34-4768-aeb2-8b1d56b11ee1)
+
+
 
 
